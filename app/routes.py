@@ -1,0 +1,1 @@
+'''API endpoints (POST /series, GET /series, GET /series/<id>, PUT /series/<id>, DELETE /series/<id>) for managing series data.'''

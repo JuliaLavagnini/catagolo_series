@@ -1,0 +1,1 @@
+'''Entry point and FastAPI app setup'''
