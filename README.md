@@ -126,4 +126,4 @@ sequenceDiagram
 
 5. **Access the application:**
    * **Web Interface:** `http://127.0.0.1:8000`
-   * **API Documentation (Swagger UI):** `http://127.0.0`
+   * **API Documentation (Swagger UI):** `http://localhost:8000/docs`
