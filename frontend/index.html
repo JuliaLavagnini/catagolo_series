@@ -5,140 +5,296 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Series Catalogue</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --paper: #f6f3ec;
+            --ink: #1c1b19;
+            --muted: #75705f;
+            --rule: #d8d1c2;
+            --accent: #a8321f;
+            --ok: #3d6b35;
+            --serif: "Fraunces", Georgia, serif;
+            --sans: "IBM Plex Sans", system-ui, sans-serif;
+            --mono: "IBM Plex Mono", ui-monospace, monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: system-ui, sans-serif;
-            max-width: 800px;
-            margin: 40px auto;
-            padding: 0 20px;
-            background: #f4f4f9;
-            color: #333;
+            margin: 0;
+            background: var(--paper);
+            color: var(--ink);
+            font-family: var(--sans);
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        main {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 56px 20px 80px;
+        }
+
+        header {
+            border-bottom: 2px solid var(--ink);
+            padding-bottom: 14px;
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 16px;
         }
 
         h1 {
-            text-align: center;
-            color: #222;
+            font-family: var(--serif);
+            font-weight: 600;
+            font-size: 44px;
+            line-height: 1;
+            letter-spacing: -0.02em;
+            margin: 0;
         }
 
-        .card {
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-            margin-bottom: 20px;
+        .count {
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            white-space: nowrap;
+        }
+
+        section {
+            margin-bottom: 44px;
+        }
+
+        h2 {
+            font-family: var(--mono);
+            font-weight: 500;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--muted);
+            margin: 0 0 14px;
         }
 
         form,
         .search-box {
             display: grid;
-            gap: 10px;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 14px 18px;
+            align-items: end;
         }
 
-        input,
-        button {
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 14px;
+        form {
+            grid-template-columns: 2fr 1.5fr 1fr 1fr auto;
         }
 
-        button {
-            background: #0066cc;
-            color: white;
+        .search-box {
+            grid-template-columns: 1fr auto auto;
+        }
+
+        label {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        input {
+            font: inherit;
+            color: var(--ink);
+            background: transparent;
             border: none;
+            border-bottom: 1px solid var(--rule);
+            border-radius: 0;
+            padding: 6px 0;
+            width: 100%;
+        }
+
+        input:focus {
+            outline: none;
+            border-bottom-color: var(--ink);
+        }
+
+        input::placeholder {
+            color: #b0a998;
+        }
+
+        button {
+            font: inherit;
+            font-size: 14px;
             cursor: pointer;
-            font-weight: bold;
+            border: 1px solid var(--ink);
+            border-radius: 2px;
+            padding: 7px 16px;
+            background: var(--ink);
+            color: var(--paper);
         }
 
         button:hover {
-            background: #0052a3;
+            background: var(--accent);
+            border-color: var(--accent);
         }
 
         .btn-secondary {
-            background: #555;
+            background: transparent;
+            color: var(--ink);
         }
 
         .btn-secondary:hover {
-            background: #333;
-        }
-
-        .series-item {
-            border-bottom: 1px solid #eee;
-            padding: 12px 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .series-item:last-child {
-            border-bottom: none;
-        }
-
-        .badge {
-            background: #e0ecff;
-            color: #0052a3;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: bold;
+            background: transparent;
+            color: var(--accent);
         }
 
         #message {
-            margin-top: 10px;
-            font-weight: bold;
+            margin: 12px 0 0;
+            font-size: 14px;
+            min-height: 1.5em;
         }
 
-        .actions {
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .series-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            border-top: 1px solid var(--rule);
+        }
+
+        .series-item {
+            display: grid;
+            grid-template-columns: 2.5em 1fr auto auto;
+            align-items: baseline;
+            gap: 16px;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--rule);
+        }
+
+        .series-index,
+        .series-year {
+            font-family: var(--mono);
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .series-title {
+            font-family: var(--serif);
+            font-size: 21px;
+            line-height: 1.2;
+        }
+
+        .series-meta {
+            display: block;
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 2px;
         }
 
         .btn-delete {
-            background: #dc3545;
-            padding: 6px 10px;
-            font-size: 12px;
+            background: none;
+            border: none;
+            padding: 0;
+            font-size: 13px;
+            color: var(--muted);
+            text-decoration: underline;
+            text-underline-offset: 3px;
         }
 
         .btn-delete:hover {
-            background: #b02a37;
+            background: none;
+            color: var(--accent);
+        }
+
+        .empty,
+        .error {
+            padding: 14px 0;
+            margin: 0;
+            color: var(--muted);
+        }
+
+        .error {
+            color: var(--accent);
+        }
+
+        @media (max-width: 640px) {
+            h1 {
+                font-size: 34px;
+            }
+
+            form {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            form label:first-child {
+                grid-column: 1 / -1;
+            }
+
+            .search-box {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .search-box input {
+                grid-column: 1 / -1;
+            }
+
+            .series-item {
+                grid-template-columns: 2em 1fr auto;
+            }
+
+            .series-year {
+                display: none;
+            }
         }
     </style>
 </head>
 
 <body>
+    <main>
+        <header>
+            <h1>Series Catalogue</h1>
+            <span class="count" id="series-count"></span>
+        </header>
 
-    <h1>🎬 Series Catalogue</h1>
+        <!-- Registration Form (POST /series) -->
+        <section>
+            <h2>Register New Series</h2>
+            <form id="register-form">
+                <label>Title
+                    <input type="text" id="title" placeholder="Dark" required>
+                </label>
+                <label>Genre
+                    <input type="text" id="genre" placeholder="Fiction" required>
+                </label>
+                <label>Year
+                    <input type="number" id="year" placeholder="2017" min="1901" required>
+                </label>
+                <label>Seasons
+                    <input type="number" id="seasons" placeholder="3" min="1" required>
+                </label>
+                <button type="submit">Register</button>
+            </form>
+            <p id="message"></p>
+        </section>
 
-    <!-- Registration Form (POST /series) -->
-    <div class="card">
-        <h2>Register New Series</h2>
-        <form id="register-form">
-            <input type="text" id="title" placeholder="Title (e.g. Dark)" required>
-            <input type="text" id="genre" placeholder="Genre (e.g. Fiction)" required>
-            <input type="number" id="year" placeholder="Year (e.g. 2017)" min="1901" required>
-            <input type="number" id="seasons" placeholder="Seasons (e.g. 3)" min="1" required>
-            <button type="submit">Register</button>
-        </form>
-        <p id="message"></p>
-    </div>
+        <!-- Search by Title (GET /series/{title}) -->
+        <section>
+            <h2>Search Series</h2>
+            <div class="search-box">
+                <input type="text" id="search-title" placeholder="Enter the exact title..." aria-label="Series title">
+                <button type="button" onclick="searchSeries()">Search</button>
+                <button type="button" class="btn-secondary" onclick="loadSeries()">Show All</button>
+            </div>
+        </section>
 
-    <!-- Search by Title (GET /series/{title}) -->
-    <div class="card">
-        <h2>Search Series</h2>
-        <div class="search-box">
-            <input type="text" id="search-title" placeholder="Enter the exact title...">
-            <button type="button" onclick="searchSeries()">Search</button>
-            <button type="button" class="btn-secondary" onclick="loadSeries()">Show All</button>
-        </div>
-    </div>
-
-    <!-- Catalogue Listing (GET /series) -->
-    <div class="card">
-        <h2>Registered Series</h2>
-        <div id="series-list">Loading...</div>
-    </div>
+        <!-- Catalogue Listing (GET /series) -->
+        <section>
+            <h2>Registered Series</h2>
+            <div id="series-list"><p class="empty">Loading...</p></div>
+        </section>
+    </main>
 
     <script>
         const API_URL = "/series";
@@ -150,8 +306,10 @@
                 const response = await fetch(API_URL);
                 const series = await response.json();
                 renderList(series);
+                document.getElementById("series-count").textContent =
+                    `${series.length} ${series.length === 1 ? "title" : "titles"}`;
             } catch (error) {
-                listEl.innerHTML = "<p style='color:red;'>Error connecting to the API. Check that Uvicorn is running.</p>";
+                listEl.innerHTML = "<p class='error'>Error connecting to the API. Check that Uvicorn is running.</p>";
             }
         }
 
@@ -176,12 +334,12 @@
             const data = await response.json();
 
             if (response.ok) {
-                msgEl.style.color = "green";
+                msgEl.style.color = "var(--ok)";
                 msgEl.textContent = data.message;
                 e.target.reset();
                 loadSeries();
             } else {
-                msgEl.style.color = "red";
+                msgEl.style.color = "var(--accent)";
                 msgEl.textContent = data.detail || "Error registering series.";
             }
         });
@@ -199,7 +357,7 @@
                 renderList([series]);
             } else {
                 const error = await response.json();
-                listEl.innerHTML = `<p style="color:red;">${error.detail}</p>`;
+                listEl.innerHTML = `<p class="error">${error.detail}</p>`;
             }
         }
 
@@ -219,26 +377,25 @@
             }
         }
 
-        // Helper function to draw the cards on screen
+        // Helper function to draw the list on screen
         function renderList(series) {
             const listEl = document.getElementById("series-list");
             if (series.length === 0) {
-                listEl.innerHTML = "<p>No series registered yet.</p>";
+                listEl.innerHTML = "<p class='empty'>No series registered yet.</p>";
                 return;
             }
 
-            listEl.innerHTML = series.map(s => `
-        <div class="series-item">
-          <div>
-            <strong>${s.title}</strong> (${s.release_year})<br>
-            <small>${s.seasons} season(s)</small>
-          </div>
-          <div class="actions">
-            <span class="badge">${s.genre}</span>
-            <button type="button" class="btn-delete" onclick="deleteSeries('${s.title.replace(/'/g, "\\'")}')">Delete</button>
-          </div>
-        </div>
-      `).join("");
+            listEl.innerHTML = `<ol class="series-list">${series.map((s, i) => `
+                <li class="series-item">
+                    <span class="series-index">${String(i + 1).padStart(2, "0")}</span>
+                    <div>
+                        <span class="series-title">${s.title}</span>
+                        <span class="series-meta">${s.genre} · ${s.seasons} ${s.seasons === 1 ? "season" : "seasons"}</span>
+                    </div>
+                    <span class="series-year">${s.release_year}</span>
+                    <button type="button" class="btn-delete" onclick="deleteSeries('${s.title.replace(/'/g, "\\'")}')">Delete</button>
+                </li>
+            `).join("")}</ol>`;
         }
 
         // Loads the catalogue automatically when the page opens
