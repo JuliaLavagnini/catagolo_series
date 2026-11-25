@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo de Séries</title>
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+            background: #f4f4f9;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            color: #222;
+        }
+
+        .card {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+        }
+
+        form,
+        .search-box {
+            display: grid;
+            gap: 10px;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        }
+
+        input,
+        button {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        button {
+            background: #0066cc;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #0052a3;
+        }
+
+        .btn-secondary {
+            background: #555;
+        }
+
+        .btn-secondary:hover {
+            background: #333;
+        }
+
+        .serie-item {
+            border-bottom: 1px solid #eee;
+            padding: 12px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .serie-item:last-child {
+            border-bottom: none;
+        }
+
+        .badge {
+            background: #e0ecff;
+            color: #0052a3;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        #mensagem {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>🎬 Catálogo de Séries</h1>
+
+    <!-- Formulário de Cadastro (POST /series) -->
+    <div class="card">
+        <h2>Cadastrar Nova Série</h2>
+        <form id="form-cadastro">
+            <input type="text" id="titulo" placeholder="Título (ex: Dark)" required>
+            <input type="text" id="genero" placeholder="Gênero (ex: Ficção)" required>
+            <input type="number" id="ano" placeholder="Ano (ex: 2017)" min="1901" required>
+            <input type="number" id="temporadas" placeholder="Temporadas (ex: 3)" min="1" required>
+            <button type="submit">Cadastrar</button>
+        </form>
+        <p id="mensagem"></p>
+    </div>
+
+    <!-- Busca por Título (GET /series/{titulo}) -->
+    <div class="card">
+        <h2>Buscar Série</h2>
+        <div class="search-box">
+            <input type="text" id="busca-titulo" placeholder="Digite o título exato...">
+            <button type="button" onclick="buscarSerie()">Buscar</button>
+            <button type="button" class="btn-secondary" onclick="carregarSeries()">Mostrar Todas</button>
+        </div>
+    </div>
+
+    <!-- Listagem do Catálogo (GET /series) -->
+    <div class="card">
+        <h2>Séries Cadastradas</h2>
+        <div id="lista-series">Carregando...</div>
+    </div>
+
+    <script>
+        const API_URL = "/series";
+
+        // 1. Listar todas as séries (GET /series)
+        async function carregarSeries() {
+            const listaEl = document.getElementById("lista-series");
+            try {
+                const resposta = await fetch(API_URL);
+                const series = await resposta.json();
+                renderizarLista(series);
+            } catch (erro) {
+                listaEl.innerHTML = "<p style='color:red;'>Erro ao conectar com a API. Verifique se o Uvicorn está rodando.</p>";
+            }
+        }
+
+        // 2. Cadastrar nova série (POST /series)
+        document.getElementById("form-cadastro").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const msgEl = document.getElementById("mensagem");
+
+            const novaSerie = {
+                titulo: document.getElementById("titulo").value,
+                genero: document.getElementById("genero").value,
+                ano_lancamento: Number(document.getElementById("ano").value),
+                temporadas: Number(document.getElementById("temporadas").value)
+            };
+
+            const resposta = await fetch(API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(novaSerie)
+            });
+
+            const dados = await resposta.json();
+
+            if (resposta.ok) {
+                msgEl.style.color = "green";
+                msgEl.textContent = dados.mensagem;
+                e.target.reset();
+                carregarSeries();
+            } else {
+                msgEl.style.color = "red";
+                msgEl.textContent = dados.detail || "Erro ao cadastrar série.";
+            }
+        });
+
+        // 3. Buscar série específica (GET /series/{titulo})
+        async function buscarSerie() {
+            const titulo = document.getElementById("busca-titulo").value.trim();
+            if (!titulo) return carregarSeries();
+
+            const listaEl = document.getElementById("lista-series");
+            const resposta = await fetch(`${API_URL}/${encodeURIComponent(titulo)}`);
+
+            if (resposta.ok) {
+                const serie = await resposta.json();
+                renderizarLista([serie]);
+            } else {
+                const erro = await resposta.json();
+                listaEl.innerHTML = `<p style="color:red;">${erro.detail}</p>`;
+            }
+        }
+
+        // Função auxiliar para desenhar os cards na tela
+        function renderizarLista(series) {
+            const listaEl = document.getElementById("lista-series");
+            if (series.length === 0) {
+                listaEl.innerHTML = "<p>Nenhuma série cadastrada ainda.</p>";
+                return;
+            }
+
+            listaEl.innerHTML = series.map(s => `
+        <div class="serie-item">
+          <div>
+            <strong>${s.titulo}</strong> (${s.ano_lancamento})<br>
+            <small>${s.temporadas} temporada(s)</small>
+          </div>
+          <span class="badge">${s.genero}</span>
+        </div>
+      `).join("");
+        }
+
+        // Carrega o catálogo automaticamente ao abrir a página
+        carregarSeries();
+    </script>
+</body>
+
+</html>

@@ -46,13 +46,17 @@ def inserir_serie(serie: dict) -> dict:
             detail=f"Ja existe uma série com o título - {serie['titulo']}",
         )
 
-def listar_series() -> list[dict]:
+
+def listar_todas_series() -> list[dict]:
     with get_connection() as conn:
         cursor = conn.execute("SELECT * FROM series")
         return [dict(row) for row in cursor.fetchall()]
 
+
 def buscar_por_titulo(titulo: str) -> dict | None:
     with get_connection() as conn:
-        cursor = conn.execute("SELECT * FROM series WHERE LOWER(titulo) = LOWER(?)", (titulo,))
+        cursor = conn.execute(
+            "SELECT * FROM series WHERE LOWER(titulo) = LOWER(?)", (titulo,)
+        )
         row = cursor.fetchone()
         return dict(row) if row else None

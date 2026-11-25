@@ -1,7 +1,7 @@
 from typing import List
-from fastapi import APIRouter, status
+from fastapi import APIRouter, status, HTTPException
 from app.schemas import CriarSerie, SerieResposta
-from app.database import buscar_por_titulo, inserir_serie
+from app.database import buscar_por_titulo, inserir_serie, listar_todas_series
 
 router = APIRouter(prefix="/series", tags=["Series"])
 
@@ -9,15 +9,13 @@ router = APIRouter(prefix="/series", tags=["Series"])
 # Rota GET /series para listar o catalogo completo
 @router.get("", response_model=list[CriarSerie], status_code=status.HTTP_200_OK)
 def listar_series():
-    return listar_series()
+    return listar_todas_series()
 
 
 # Rota POST /series
 @router.post("", response_model=SerieResposta, status_code=status.HTTP_201_CREATED)
 def cadastrar_serie(nova_serie: CriarSerie):
-    serie_salva = inserir_serie(nova_serie.model_dump())
-    return {"mensagem": "Série cadastrada com sucesso!", "serie": serie_salva}
-
+    return inserir_serie(nova_serie.model_dump())
 
 @router.get("/{titulo}", response_model=CriarSerie, status_code=status.HTTP_200_OK)
 def obter_serie(titulo: str):
