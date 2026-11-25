@@ -2,6 +2,8 @@
 
 Lightweight Full-Stack application built in Python with **FastAPI**, **SQLite** and **HTML/CSS/JavaScript**, allowing you to register, list, search and remove series through a RESTful API or directly through the integrated web interface.
 
+![Series Catalogue demo](demo/demo.gif)
+
 ## 🚀 Project Evolution by Stages
 
 1. **Registration and Validation (`POST /series`)**: Modular structuring of the API and creation of models with **Pydantic** to validate business rules (release year > 1900 and seasons > 0).
