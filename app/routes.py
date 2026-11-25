@@ -11,4 +11,4 @@ def cadastrar_serie(nova_serie: CriarSerie):
     serie_dict = nova_serie.model_dump()
     catalogo.append(serie_dict)
     salvar_series(catalogo)
-    return {"mensagem": "Série cadastrada com sucesso", "serie": serie_dict}
+    return {"mensagem": "Série cadastrada com sucesso!", "serie": serie_dict}
