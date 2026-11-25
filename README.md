@@ -1,129 +1,129 @@
-# 🎬 Catálogo de Séries API & Web App
+# 🎬 Series Catalogue API & Web App
 
-Aplicação Full-Stack leve desenvolvida em Python com **FastAPI**, **SQLite** e **HTML/CSS/JavaScript**, permitindo cadastrar, listar, buscar e remover séries através de uma API RESTful ou diretamente pela interface web integrada.
+Lightweight Full-Stack application built in Python with **FastAPI**, **SQLite** and **HTML/CSS/JavaScript**, allowing you to register, list, search and remove series through a RESTful API or directly through the integrated web interface.
 
-## 🚀 Evolução do Projeto por Etapas
+## 🚀 Project Evolution by Stages
 
-1. **Cadastro e Validação (`POST /series`)**: Estruturação modular da API e criação de modelos com **Pydantic** para validar regras de negócio (ano de lançamento > 1900 e temporadas > 0).
-2. **Listagem do Catálogo (`GET /series`)**: Implementação da consulta completa de todas as séries registradas em formato JSON.
-3. **Banco de Dados SQLite e Busca Específica (`GET /series/{titulo}`)**: Migração da persistência para **SQLite (`sqlite3`)**, adicionando busca *case-insensitive* por título e tratamento de status HTTP (`201`, `400`, `404`).
-4. **Remoção e Interface Web (`DELETE /series/{titulo}` & Front-end)**: Criação da rota de exclusão e desenvolvimento de uma interface em HTML/JS puro servida diretamente pelo FastAPI (`FileResponse`) via `fetch` API.
+1. **Registration and Validation (`POST /series`)**: Modular structuring of the API and creation of models with **Pydantic** to validate business rules (release year > 1900 and seasons > 0).
+2. **Catalogue Listing (`GET /series`)**: Implementation of the full query of all registered series in JSON format.
+3. **SQLite Database and Specific Search (`GET /series/{title}`)**: Migration of persistence to **SQLite (`sqlite3`)**, adding *case-insensitive* search by title and HTTP status handling (`201`, `400`, `404`).
+4. **Removal and Web Interface (`DELETE /series/{title}` & Front-end)**: Creation of the delete route and development of a pure HTML/JS interface served directly by FastAPI (`FileResponse`) via the `fetch` API.
 
-## 📁 Estrutura do Projeto
+## 📁 Project Structure
 
 ```text
 catalogue_series/
 ├── app/
-│   ├── __init__.py       # Inicialização do pacote Python
-│   ├── main.py           # Configuração do FastAPI, CORS e rota do Front-end
-│   ├── schemas.py        # Modelos de validação Pydantic
-│   ├── database.py       # Conexão e operações CRUD com SQLite
-│   └── routes.py         # Endpoints da API (/series)
+│   ├── __init__.py       # Python package initialization
+│   ├── main.py           # FastAPI configuration, CORS and Front-end route
+│   ├── schemas.py        # Pydantic validation models
+│   ├── database.py       # SQLite connection and CRUD operations
+│   └── routes.py         # API endpoints (/series)
 ├── frontend/
-│   └── index.html        # Interface web (HTML, CSS e JavaScript)
-├── .gitignore            # Arquivos ignorados pelo Git (venv, __pycache__, .db)
-├── requirements.txt      # Dependências do projeto
-└── README.md             # Documentação do repositório
+│   └── index.html        # Web interface (HTML, CSS and JavaScript)
+├── .gitignore            # Files ignored by Git (venv, __pycache__, .db)
+├── requirements.txt      # Project dependencies
+└── README.md             # Repository documentation
 ```
 
-## 🛠️ Tecnologias Utilizadas
+## 🛠️ Technologies Used
 
 * **Back-end:** Python 3, FastAPI, Pydantic, Uvicorn
-* **Banco de Dados:** SQLite (`sqlite3`)
+* **Database:** SQLite (`sqlite3`)
 * **Front-end:** HTML5, CSS3, JavaScript (Fetch API)
 
-## 🧩 Desenho do Sistema
+## 🧩 System Design
 
 ```mermaid
 flowchart LR
-    U[Usuário] -->|Acessa a página| B[Browser]
+    U[User] -->|Accesses the page| B[Browser]
     B -->|HTML/CSS/JavaScript| F[frontend/index.html]
-    B -->|GET / e Fetch API| A[FastAPI - app/main.py]
+    B -->|GET / and Fetch API| A[FastAPI - app/main.py]
 
     subgraph Back-end
-        A --> R[Rotas - app/routes.py]
-        R --> S[Validação Pydantic - app/schemas.py]
-        R --> D[Operações CRUD - app/database.py]
+        A --> R[Routes - app/routes.py]
+        R --> S[Pydantic Validation - app/schemas.py]
+        R --> D[CRUD Operations - app/database.py]
     end
 
     D -->|SQL| DB[(SQLite - series.db)]
-    DB -->|Registros| D
-    D -->|Dados JSON| R
-    R -->|Resposta HTTP| B
+    DB -->|Records| D
+    D -->|JSON Data| R
+    R -->|HTTP Response| B
 ```
 
-## 🔄 Fluxo de Trabalho
+## 🔄 Workflow
 
 ```mermaid
 sequenceDiagram
-    actor Usuario
+    actor User
     participant Interface as Front-end
     participant API as FastAPI
-    participant Validacao as Pydantic
-    participant Banco as SQLite
+    participant Validation as Pydantic
+    participant Database as SQLite
 
-    Usuario->>Interface: Cadastra, busca, lista ou exclui
-    Interface->>API: Requisição HTTP (GET, POST ou DELETE)
+    User->>Interface: Registers, searches, lists or deletes
+    Interface->>API: HTTP Request (GET, POST or DELETE)
 
     alt POST /series
-        API->>Validacao: Valida os dados da série
-        Validacao-->>API: Dados válidos
-        API->>Banco: INSERT
-        Banco-->>API: Confirmação
-        API-->>Interface: 201 + mensagem
+        API->>Validation: Validates the series data
+        Validation-->>API: Valid data
+        API->>Database: INSERT
+        Database-->>API: Confirmation
+        API-->>Interface: 201 + message
     else GET /series
-        API->>Banco: SELECT todas as séries
-        Banco-->>API: Lista de séries
+        API->>Database: SELECT all series
+        Database-->>API: List of series
         API-->>Interface: 200 + JSON
-    else GET /series/{titulo}
-        API->>Banco: Busca por título
-        Banco-->>API: Série ou vazio
-        alt Série encontrada
-            API-->>Interface: 200 + série
-        else Série não encontrada
+    else GET /series/{title}
+        API->>Database: Search by title
+        Database-->>API: Series or empty
+        alt Series found
+            API-->>Interface: 200 + series
+        else Series not found
             API-->>Interface: 404
         end
-    else DELETE /series/{titulo}
-        API->>Banco: DELETE por título
-        Banco-->>API: Removida ou não encontrada
-        alt Série removida
-            API-->>Interface: 200 + mensagem
-        else Série não encontrada
+    else DELETE /series/{title}
+        API->>Database: DELETE by title
+        Database-->>API: Removed or not found
+        alt Series removed
+            API-->>Interface: 200 + message
+        else Series not found
             API-->>Interface: 404
         end
     end
 
-    Interface->>Interface: Atualiza a tela
-    Interface-->>Usuario: Exibe resultado
+    Interface->>Interface: Updates the screen
+    Interface-->>User: Displays result
 ```
 
-## ⚙️ Como Executar Localmente
+## ⚙️ How to Run Locally
 
-1. **Clone o repositório:**
+1. **Clone the repository:**
    ```bash
    git clone https://github.com/JuliaLavagnini/catagolo_series
    cd catalogue-series
    ```
 
-2. **Crie e ative um ambiente virtual:**
+2. **Create and activate a virtual environment:**
    ```bash
    python -m venv venv
-   # No Windows:
+   # On Windows:
    venv\Scripts\activate
-   # No Linux/Mac:
+   # On Linux/Mac:
    source venv/bin/activate
    ```
 
-3. **Instale as dependências:**
+3. **Install the dependencies:**
    ```bash
    pip install -r requirements.txt
    ```
 
-4. **Inicie o servidor:**
+4. **Start the server:**
    ```bash
    uvicorn app.main:app --reload
    ```
 
-5. **Acesse a aplicação:**
-   * **Interface Web:** `http://127.0.0.1:8000`
-   * **Documentação da API (Swagger UI):** `http://127.0.0`
+5. **Access the application:**
+   * **Web Interface:** `http://127.0.0.1:8000`
+   * **API Documentation (Swagger UI):** `http://127.0.0`

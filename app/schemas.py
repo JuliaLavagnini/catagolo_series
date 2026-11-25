@@ -1,15 +1,15 @@
 from pydantic import BaseModel, Field
 
 
-class CriarSerie(BaseModel):
-    titulo: str = Field(..., min_length=1, description="Título da série")
-    genero: str = Field(..., min_length=1, description="Gênero da série")
-    ano_lancamento: int = Field(
-        ..., gt=1900, description="Ano de lançamento (maior que 1900)"
+class CreateSeries(BaseModel):
+    title: str = Field(..., min_length=1, description="Series title")
+    genre: str = Field(..., min_length=1, description="Series genre")
+    release_year: int = Field(
+        ..., gt=1900, description="Release year (greater than 1900)"
     )
-    temporadas: int = Field(..., gt=0, description="Número de temporadas da série")
+    seasons: int = Field(..., gt=0, description="Number of seasons of the series")
 
 
-class SerieResposta(BaseModel):
-    mensagem: str
-    serie: CriarSerie
+class SeriesResponse(BaseModel):
+    message: str
+    series: CreateSeries

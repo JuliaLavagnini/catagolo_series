@@ -6,7 +6,7 @@ DB_PATH = "series.db"
 
 def get_connection():
     conn = sqlite3.connect(DB_PATH)
-    # Permite acessar as colunas pelo nome (row['titulo']) em vez de indice
+    # Allows accessing columns by name (row['title']) instead of index
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -16,59 +16,59 @@ def init_db() -> None:
         conn.execute("""
             CREATE TABLE IF NOT EXISTS series (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                titulo TEXT NOT NULL,
-                genero TEXT NOT NULL,
-                ano_lancamento INTEGER NOT NULL,
-                temporadas INTEGER NOT NULL
+                title TEXT NOT NULL,
+                genre TEXT NOT NULL,
+                release_year INTEGER NOT NULL,
+                seasons INTEGER NOT NULL
             )
         """)
 
 
-def inserir_serie(serie: dict) -> dict:
+def insert_series(series: dict) -> dict:
     try:
         with get_connection() as conn:
             conn.execute(
                 """
-                        INSERT INTO series (titulo, genero, ano_lancamento, temporadas)
+                        INSERT INTO series (title, genre, release_year, seasons)
                         VALUES (?, ?, ?, ?)
                     """,
                 (
-                    serie["titulo"],
-                    serie["genero"],
-                    serie["ano_lancamento"],
-                    serie["temporadas"],
+                    series["title"],
+                    series["genre"],
+                    series["release_year"],
+                    series["seasons"],
                 ),
             )
-            return {"mensagem": "Série inserida com sucesso!", "serie": serie}
+            return {"message": "Series inserted successfully!", "series": series}
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Ja existe uma série com o título - {serie['titulo']}",
+            detail=f"A series with this title already exists - {series['title']}",
         )
 
 
-def listar_todas_series() -> list[dict]:
+def list_all_series() -> list[dict]:
     with get_connection() as conn:
         cursor = conn.execute("SELECT * FROM series")
         return [dict(row) for row in cursor.fetchall()]
 
 
-def buscar_por_titulo(titulo: str) -> dict | None:
+def find_by_title(title: str) -> dict | None:
     with get_connection() as conn:
         cursor = conn.execute(
-            "SELECT * FROM series WHERE LOWER(titulo) = LOWER(?)", (titulo,)
+            "SELECT * FROM series WHERE LOWER(title) = LOWER(?)", (title,)
         )
         row = cursor.fetchone()
         return dict(row) if row else None
 
 
-def delete_serie_por_titulo(titulo: str) -> bool:
+def delete_series_by_title(title: str) -> bool:
     with get_connection() as conn:
         cursor = conn.execute(
-            "DELETE FROM series WHERE LOWER(titulo) = LOWER(?)", (titulo,)
+            "DELETE FROM series WHERE LOWER(title) = LOWER(?)", (title,)
         )
         if cursor.rowcount == 0:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Série não encontrada"
+                status_code=status.HTTP_404_NOT_FOUND, detail="Series not found"
             )
         return cursor.rowcount > 0

@@ -1,50 +1,50 @@
 from typing import List
 from fastapi import APIRouter, status, HTTPException
-from app.schemas import CriarSerie, SerieResposta
+from app.schemas import CreateSeries, SeriesResponse
 from app.database import (
-    buscar_por_titulo,
-    inserir_serie,
-    listar_todas_series,
-    delete_serie_por_titulo,
+    find_by_title,
+    insert_series,
+    list_all_series,
+    delete_series_by_title,
 )
 
 router = APIRouter(prefix="/series", tags=["Series"])
 
 
-# Rota GET /series para listar o catalogo completo
-@router.get("", response_model=list[CriarSerie], status_code=status.HTTP_200_OK)
-def listar_series():
-    return listar_todas_series()
+# GET /series route to list the full catalogue
+@router.get("", response_model=list[CreateSeries], status_code=status.HTTP_200_OK)
+def list_series():
+    return list_all_series()
 
 
-# Rota POST /series
-@router.post("", response_model=SerieResposta, status_code=status.HTTP_201_CREATED)
-def cadastrar_serie(nova_serie: CriarSerie):
-    return inserir_serie(nova_serie.model_dump())
+# POST /series route
+@router.post("", response_model=SeriesResponse, status_code=status.HTTP_201_CREATED)
+def register_series(new_series: CreateSeries):
+    return insert_series(new_series.model_dump())
 
 
-@router.get("/{titulo}", response_model=CriarSerie, status_code=status.HTTP_200_OK)
-def obter_serie(titulo: str):
-    # Busca exata
-    serie = buscar_por_titulo(titulo)
+@router.get("/{title}", response_model=CreateSeries, status_code=status.HTTP_200_OK)
+def get_series(title: str):
+    # Exact search
+    series = find_by_title(title)
 
-    # Caso nao encontre e a URL tenha hifens, tenta substituir por espaco
-    if not serie and "-" in titulo:
-        serie = buscar_por_titulo(titulo.replace("-", " "))
+    # If not found and the URL has hyphens, try replacing them with spaces
+    if not series and "-" in title:
+        series = find_by_title(title.replace("-", " "))
 
-    if not serie:
+    if not series:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Série não encontrada"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Series not found"
         )
-    return serie
+    return series
 
 
-@router.delete("/{titulo}", status_code=status.HTTP_200_OK)
-def deletar_serie(titulo: str):
-    removida = delete_serie_por_titulo(titulo)
+@router.delete("/{title}", status_code=status.HTTP_200_OK)
+def delete_series(title: str):
+    removed = delete_series_by_title(title)
 
-    if not removida:
+    if not removed:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Série não encontrada"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Series not found"
         )
-    return {"mensagem": "Série '{titulo}' removida com sucesso!"}
+    return {"message": "Series '{title}' removed successfully!"}

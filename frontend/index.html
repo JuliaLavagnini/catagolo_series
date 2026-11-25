@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catálogo de Séries</title>
+    <title>Series Catalogue</title>
     <style>
         body {
             font-family: system-ui, sans-serif;
@@ -63,7 +63,7 @@
             background: #333;
         }
 
-        .serie-item {
+        .series-item {
             border-bottom: 1px solid #eee;
             padding: 12px 0;
             display: flex;
@@ -71,7 +71,7 @@
             align-items: center;
         }
 
-        .serie-item:last-child {
+        .series-item:last-child {
             border-bottom: none;
         }
 
@@ -84,12 +84,12 @@
             font-weight: bold;
         }
 
-        #mensagem {
+        #message {
             margin-top: 10px;
             font-weight: bold;
         }
 
-        .acoes {
+        .actions {
             display: flex;
             align-items: center;
             gap: 10px;
@@ -109,140 +109,140 @@
 
 <body>
 
-    <h1>🎬 Catálogo de Séries</h1>
+    <h1>🎬 Series Catalogue</h1>
 
-    <!-- Formulário de Cadastro (POST /series) -->
+    <!-- Registration Form (POST /series) -->
     <div class="card">
-        <h2>Cadastrar Nova Série</h2>
-        <form id="form-cadastro">
-            <input type="text" id="titulo" placeholder="Título (ex: Dark)" required>
-            <input type="text" id="genero" placeholder="Gênero (ex: Ficção)" required>
-            <input type="number" id="ano" placeholder="Ano (ex: 2017)" min="1901" required>
-            <input type="number" id="temporadas" placeholder="Temporadas (ex: 3)" min="1" required>
-            <button type="submit">Cadastrar</button>
+        <h2>Register New Series</h2>
+        <form id="register-form">
+            <input type="text" id="title" placeholder="Title (e.g. Dark)" required>
+            <input type="text" id="genre" placeholder="Genre (e.g. Fiction)" required>
+            <input type="number" id="year" placeholder="Year (e.g. 2017)" min="1901" required>
+            <input type="number" id="seasons" placeholder="Seasons (e.g. 3)" min="1" required>
+            <button type="submit">Register</button>
         </form>
-        <p id="mensagem"></p>
+        <p id="message"></p>
     </div>
 
-    <!-- Busca por Título (GET /series/{titulo}) -->
+    <!-- Search by Title (GET /series/{title}) -->
     <div class="card">
-        <h2>Buscar Série</h2>
+        <h2>Search Series</h2>
         <div class="search-box">
-            <input type="text" id="busca-titulo" placeholder="Digite o título exato...">
-            <button type="button" onclick="buscarSerie()">Buscar</button>
-            <button type="button" class="btn-secondary" onclick="carregarSeries()">Mostrar Todas</button>
+            <input type="text" id="search-title" placeholder="Enter the exact title...">
+            <button type="button" onclick="searchSeries()">Search</button>
+            <button type="button" class="btn-secondary" onclick="loadSeries()">Show All</button>
         </div>
     </div>
 
-    <!-- Listagem do Catálogo (GET /series) -->
+    <!-- Catalogue Listing (GET /series) -->
     <div class="card">
-        <h2>Séries Cadastradas</h2>
-        <div id="lista-series">Carregando...</div>
+        <h2>Registered Series</h2>
+        <div id="series-list">Loading...</div>
     </div>
 
     <script>
         const API_URL = "/series";
 
-        // 1. Listar todas as séries (GET /series)
-        async function carregarSeries() {
-            const listaEl = document.getElementById("lista-series");
+        // 1. List all series (GET /series)
+        async function loadSeries() {
+            const listEl = document.getElementById("series-list");
             try {
-                const resposta = await fetch(API_URL);
-                const series = await resposta.json();
-                renderizarLista(series);
-            } catch (erro) {
-                listaEl.innerHTML = "<p style='color:red;'>Erro ao conectar com a API. Verifique se o Uvicorn está rodando.</p>";
+                const response = await fetch(API_URL);
+                const series = await response.json();
+                renderList(series);
+            } catch (error) {
+                listEl.innerHTML = "<p style='color:red;'>Error connecting to the API. Check that Uvicorn is running.</p>";
             }
         }
 
-        // 2. Cadastrar nova série (POST /series)
-        document.getElementById("form-cadastro").addEventListener("submit", async (e) => {
+        // 2. Register new series (POST /series)
+        document.getElementById("register-form").addEventListener("submit", async (e) => {
             e.preventDefault();
-            const msgEl = document.getElementById("mensagem");
+            const msgEl = document.getElementById("message");
 
-            const novaSerie = {
-                titulo: document.getElementById("titulo").value,
-                genero: document.getElementById("genero").value,
-                ano_lancamento: Number(document.getElementById("ano").value),
-                temporadas: Number(document.getElementById("temporadas").value)
+            const newSeries = {
+                title: document.getElementById("title").value,
+                genre: document.getElementById("genre").value,
+                release_year: Number(document.getElementById("year").value),
+                seasons: Number(document.getElementById("seasons").value)
             };
 
-            const resposta = await fetch(API_URL, {
+            const response = await fetch(API_URL, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(novaSerie)
+                body: JSON.stringify(newSeries)
             });
 
-            const dados = await resposta.json();
+            const data = await response.json();
 
-            if (resposta.ok) {
+            if (response.ok) {
                 msgEl.style.color = "green";
-                msgEl.textContent = dados.mensagem;
+                msgEl.textContent = data.message;
                 e.target.reset();
-                carregarSeries();
+                loadSeries();
             } else {
                 msgEl.style.color = "red";
-                msgEl.textContent = dados.detail || "Erro ao cadastrar série.";
+                msgEl.textContent = data.detail || "Error registering series.";
             }
         });
 
-        // 3. Buscar série específica (GET /series/{titulo})
-        async function buscarSerie() {
-            const titulo = document.getElementById("busca-titulo").value.trim();
-            if (!titulo) return carregarSeries();
+        // 3. Search for a specific series (GET /series/{title})
+        async function searchSeries() {
+            const title = document.getElementById("search-title").value.trim();
+            if (!title) return loadSeries();
 
-            const listaEl = document.getElementById("lista-series");
-            const resposta = await fetch(`${API_URL}/${encodeURIComponent(titulo)}`);
+            const listEl = document.getElementById("series-list");
+            const response = await fetch(`${API_URL}/${encodeURIComponent(title)}`);
 
-            if (resposta.ok) {
-                const serie = await resposta.json();
-                renderizarLista([serie]);
+            if (response.ok) {
+                const series = await response.json();
+                renderList([series]);
             } else {
-                const erro = await resposta.json();
-                listaEl.innerHTML = `<p style="color:red;">${erro.detail}</p>`;
+                const error = await response.json();
+                listEl.innerHTML = `<p style="color:red;">${error.detail}</p>`;
             }
         }
 
-        // 4. Excluir série (DELETE /series/{titulo})
-        async function deletarSerie(titulo) {
-            if (!confirm(`Tem certeza que deseja excluir "${titulo}"?`)) return;
+        // 4. Delete series (DELETE /series/{title})
+        async function deleteSeries(title) {
+            if (!confirm(`Are you sure you want to delete "${title}"?`)) return;
 
-            const resposta = await fetch(`${API_URL}/${encodeURIComponent(titulo)}`, {
+            const response = await fetch(`${API_URL}/${encodeURIComponent(title)}`, {
                 method: "DELETE"
             });
 
-            if (resposta.ok) {
-                carregarSeries(); // Atualiza a lista na tela após excluir
+            if (response.ok) {
+                loadSeries(); // Refreshes the list on screen after deleting
             } else {
-                const erro = await resposta.json();
-                alert(erro.detail || "Erro ao excluir a série.");
+                const error = await response.json();
+                alert(error.detail || "Error deleting the series.");
             }
         }
 
-        // Função auxiliar para desenhar os cards na tela
-        function renderizarLista(series) {
-            const listaEl = document.getElementById("lista-series");
+        // Helper function to draw the cards on screen
+        function renderList(series) {
+            const listEl = document.getElementById("series-list");
             if (series.length === 0) {
-                listaEl.innerHTML = "<p>Nenhuma série cadastrada ainda.</p>";
+                listEl.innerHTML = "<p>No series registered yet.</p>";
                 return;
             }
 
-            listaEl.innerHTML = series.map(s => `
-        <div class="serie-item">
+            listEl.innerHTML = series.map(s => `
+        <div class="series-item">
           <div>
-            <strong>${s.titulo}</strong> (${s.ano_lancamento})<br>
-            <small>${s.temporadas} temporada(s)</small>
+            <strong>${s.title}</strong> (${s.release_year})<br>
+            <small>${s.seasons} season(s)</small>
           </div>
-          <div class="acoes">
-            <span class="badge">${s.genero}</span>
-            <button type="button" class="btn-delete" onclick="deletarSerie('${s.titulo.replace(/'/g, "\\'")}')">Excluir</button>
+          <div class="actions">
+            <span class="badge">${s.genre}</span>
+            <button type="button" class="btn-delete" onclick="deleteSeries('${s.title.replace(/'/g, "\\'")}')">Delete</button>
           </div>
         </div>
       `).join("");
         }
 
-        // Carrega o catálogo automaticamente ao abrir a página
-        carregarSeries();
+        // Loads the catalogue automatically when the page opens
+        loadSeries();
     </script>
 </body>
 

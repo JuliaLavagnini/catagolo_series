@@ -1,14 +1,14 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
-from app.routes import router as series_rota
+from app.routes import router as series_router
 from app.database import init_db
 
 init_db()
 
-app = FastAPI(title="Catálogo de Séries API")
+app = FastAPI(title="Series Catalogue API")
 
-# Libera o accesso para o front-end
+# Allows access for the front-end
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -23,4 +23,4 @@ def home():
     return FileResponse("frontend/index.html")
 
 
-app.include_router(series_rota)
+app.include_router(series_router)
