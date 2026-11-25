@@ -1,7 +1,7 @@
-from sys import prefix
+from typing import List
 from fastapi import APIRouter, status
 from app.schemas import CriarSerie, SerieResposta
-from app.database import buscar_por_titulo, carregar_series, salvar_series
+from app.database import buscar_por_titulo, inserir_serie
 
 router = APIRouter(prefix="/series", tags=["Series"])
 
