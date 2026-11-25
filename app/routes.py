@@ -1,7 +1,12 @@
 from typing import List
 from fastapi import APIRouter, status, HTTPException
 from app.schemas import CriarSerie, SerieResposta
-from app.database import buscar_por_titulo, inserir_serie, listar_todas_series
+from app.database import (
+    buscar_por_titulo,
+    inserir_serie,
+    listar_todas_series,
+    delete_serie_por_titulo,
+)
 
 router = APIRouter(prefix="/series", tags=["Series"])
 
@@ -17,6 +22,7 @@ def listar_series():
 def cadastrar_serie(nova_serie: CriarSerie):
     return inserir_serie(nova_serie.model_dump())
 
+
 @router.get("/{titulo}", response_model=CriarSerie, status_code=status.HTTP_200_OK)
 def obter_serie(titulo: str):
     # Busca exata
@@ -31,3 +37,14 @@ def obter_serie(titulo: str):
             status_code=status.HTTP_404_NOT_FOUND, detail="Série não encontrada"
         )
     return serie
+
+
+@router.delete("/{titulo}", status_code=status.HTTP_200_OK)
+def deletar_serie(titulo: str):
+    removida = delete_serie_por_titulo(titulo)
+
+    if not removida:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Série não encontrada"
+        )
+    return {"mensagem": "Série '{titulo}' removida com sucesso!"}

@@ -88,6 +88,22 @@
             margin-top: 10px;
             font-weight: bold;
         }
+
+        .acoes {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            padding: 6px 10px;
+            font-size: 12px;
+        }
+
+        .btn-delete:hover {
+            background: #b02a37;
+        }
     </style>
 </head>
 
@@ -187,6 +203,22 @@
             }
         }
 
+        // 4. Excluir série (DELETE /series/{titulo})
+        async function deletarSerie(titulo) {
+            if (!confirm(`Tem certeza que deseja excluir "${titulo}"?`)) return;
+
+            const resposta = await fetch(`${API_URL}/${encodeURIComponent(titulo)}`, {
+                method: "DELETE"
+            });
+
+            if (resposta.ok) {
+                carregarSeries(); // Atualiza a lista na tela após excluir
+            } else {
+                const erro = await resposta.json();
+                alert(erro.detail || "Erro ao excluir a série.");
+            }
+        }
+
         // Função auxiliar para desenhar os cards na tela
         function renderizarLista(series) {
             const listaEl = document.getElementById("lista-series");
@@ -201,7 +233,10 @@
             <strong>${s.titulo}</strong> (${s.ano_lancamento})<br>
             <small>${s.temporadas} temporada(s)</small>
           </div>
-          <span class="badge">${s.genero}</span>
+          <div class="acoes">
+            <span class="badge">${s.genero}</span>
+            <button type="button" class="btn-delete" onclick="deletarSerie('${s.titulo.replace(/'/g, "\\'")}')">Excluir</button>
+          </div>
         </div>
       `).join("");
         }

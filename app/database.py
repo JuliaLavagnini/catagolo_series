@@ -60,3 +60,15 @@ def buscar_por_titulo(titulo: str) -> dict | None:
         )
         row = cursor.fetchone()
         return dict(row) if row else None
+
+
+def delete_serie_por_titulo(titulo: str) -> bool:
+    with get_connection() as conn:
+        cursor = conn.execute(
+            "DELETE FROM series WHERE LOWER(titulo) = LOWER(?)", (titulo,)
+        )
+        if cursor.rowcount == 0:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Série não encontrada"
+            )
+        return cursor.rowcount > 0
